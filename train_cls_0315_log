@@ -1,0 +1,224 @@
+nohup: ignoring input
+03/15 19:03:47 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.9.13 | packaged by conda-forge | (main, May 27 2022, 16:58:50) [GCC 10.3.0]
+    CUDA available: True
+    numpy_random_seed: 1813009069
+    GPU 0: NVIDIA GeForce RTX 3090
+    CUDA_HOME: /usr/local/cuda-11.7
+    NVCC: Cuda compilation tools, release 11.7, V11.7.64
+    GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
+    PyTorch: 1.13.1+cu117
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.7
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.5
+  - Magma 2.6.1
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.7, CUDNN_VERSION=8.5.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wunused-local-typedefs -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.13.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.14.1+cu117
+    OpenCV: 4.9.0
+    MMEngine: 0.7.2
+
+Runtime environment:
+    cudnn_benchmark: True
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    dist_cfg: {'backend': 'nccl', 'init_method': 'env://'}
+    seed: None
+    diff_rank_seed: False
+    deterministic: False
+    Distributed launcher: none
+    Distributed training: False
+    GPU number: 1
+------------------------------------------------------------
+
+03/15 19:03:47 - mmengine - INFO - Config:
+model = dict(
+    type='APESClassifier',
+    backbone=dict(type='APESClsBackbone', which_ds='local'),
+    neck=None,
+    head=dict(type='APESClsHead'),
+    data_preprocessor=None,
+    init_cfg=None)
+data_preprocessor = None
+train_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
+    persistent_workers=True,
+    pin_memory=True,
+    drop_last=True,
+    dataset=dict(
+        type='ModelNet',
+        data_root='./data/modelnet',
+        data_prefix=dict(pcd_path='pcd/train/', cls_label_path='label/train/'),
+        pipeline=[
+            dict(type='LoadPCD'),
+            dict(type='LoadCLSLabel'),
+            dict(type='ShufflePointsOrder'),
+            dict(
+                type='DataAugmentation',
+                axis='y',
+                angle=15,
+                shift=0.2,
+                min_scale=0.66,
+                max_scale=1.5,
+                sigma=0.01,
+                clip=0.05),
+            dict(type='ToCLSTensor'),
+            dict(type='PackCLSInputs')
+        ]),
+    sampler=dict(type='DefaultSampler', shuffle=True),
+    collate_fn=dict(type='default_collate'))
+val_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
+    persistent_workers=True,
+    pin_memory=True,
+    drop_last=True,
+    dataset=dict(
+        type='ModelNet',
+        data_root='./data/modelnet',
+        data_prefix=dict(pcd_path='pcd/test/', cls_label_path='label/test/'),
+        pipeline=[
+            dict(type='LoadPCD'),
+            dict(type='LoadCLSLabel'),
+            dict(type='ToCLSTensor'),
+            dict(type='PackCLSInputs')
+        ]),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    collate_fn=dict(type='default_collate'))
+test_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
+    persistent_workers=True,
+    pin_memory=True,
+    drop_last=True,
+    dataset=dict(
+        type='ModelNet',
+        data_root='./data/modelnet',
+        data_prefix=dict(pcd_path='pcd/test/', cls_label_path='label/test/'),
+        pipeline=[
+            dict(type='LoadPCD'),
+            dict(type='LoadCLSLabel'),
+            dict(type='ToCLSTensor'),
+            dict(type='PackCLSInputs')
+        ]),
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    collate_fn=dict(type='default_collate'))
+val_evaluator = dict(type='Accuracy', mode='val')
+test_evaluator = dict(type='Accuracy', mode='test')
+optim_wrapper = dict(
+    type='AmpOptimWrapper',
+    optimizer=dict(type='AdamW', lr=0.0001, weight_decay=1))
+auto_scale_lr = dict(base_batch_size=8, enable=False)
+param_scheduler = [
+    dict(
+        type='LinearLR',
+        start_factor=0.0001,
+        end_factor=1,
+        by_epoch=True,
+        begin=0,
+        end=10),
+    dict(
+        type='CosineAnnealingLR',
+        T_max=190,
+        eta_min=0,
+        by_epoch=True,
+        begin=10,
+        end=200)
+]
+train_cfg = dict(
+    type='EpochBasedTrainLoop', max_epochs=200, val_begin=1, val_interval=1)
+val_cfg = dict(type='ValLoop', fp16=False)
+test_cfg = dict(type='TestLoop', fp16=False)
+default_hooks = dict(
+    runtime_info=dict(type='RuntimeInfoHook'),
+    timer=dict(type='IterTimerHook'),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    logger=dict(
+        type='ModifiedLoggerHook',
+        log_metric_by_epoch=True,
+        interval=1000000000.0,
+        ignore_last=False,
+        interval_exp_name=0),
+    checkpoint=dict(
+        type='ModifiedCheckpointHook',
+        by_epoch=True,
+        interval=-1,
+        max_keep_ckpts=-1,
+        save_optimizer=True,
+        save_param_scheduler=True,
+        published_keys=['state_dict'],
+        save_last=False,
+        save_best=['val_acc'],
+        rule=['greater']))
+custom_hooks = None
+default_scope = 'mmengine'
+work_dir = './work_dirs/apes_cls_local-modelnet-200epochs'
+load_from = None
+resume = False
+launcher = 'none'
+experiment_name = 'apes_cls_local-modelnet-200epochs'
+env_cfg = dict(
+    cudnn_benchmark=True,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
+    dist_cfg=dict(backend='nccl', init_method='env://'))
+randomness = dict(seed=None, diff_rank_seed=False, deterministic=False)
+log_level = 'INFO'
+log_processor = dict(
+    by_epoch=True,
+    custom_cfg=[
+        dict(
+            data_src='loss',
+            log_name='loss',
+            method_name='mean',
+            window_size='epoch'),
+        dict(
+            data_src='acc',
+            log_name='acc',
+            method_name='mean',
+            window_size='epoch')
+    ])
+visualizer = dict(
+    type='APESVisualizer', vis_backends=[dict(type='ModifiedLocalVisBackend')])
+cfg = dict(compile=True, sync_bn='torch', find_unused_parameters=False)
+
+03/15 19:03:47 - mmengine - WARNING - The prefix is not set in metric class Accuracy.
+Traceback (most recent call last):
+  File "/data/zhangrui/APES/utils/train.py", line 27, in <module>
+    main()
+  File "/data/zhangrui/APES/utils/train.py", line 20, in main
+    runner = Runner.from_cfg(cfg)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 439, in from_cfg
+    runner = cls(
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 408, in __init__
+    self.model = self.wrap_model(
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 851, in wrap_model
+    model = model.to(get_device())
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/model/base_model/base_model.py", line 202, in to
+    return super().to(*args, **kwargs)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 989, in to
+    return self._apply(convert)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
+    module._apply(fn)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
+    module._apply(fn)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 664, in _apply
+    param_applied = fn(param)
+  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 987, in convert
+    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 MiB (GPU 0; 23.70 GiB total capacity; 1.84 MiB already allocated; 3.56 MiB free; 2.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
