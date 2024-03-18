@@ -218,7 +218,7 @@ class N2PAttention(nn.Module):
         self.bn2 = nn.BatchNorm1d(128)
 
         self.mamba = MixerModel(d_model=128, 
-                                n_layer=2,
+                                n_layer=1,
                                 rms_norm=False,
                                 drop_out_in_block=0.,
                                 drop_path=0.)
@@ -236,20 +236,20 @@ class N2PAttention(nn.Module):
         attention = self.softmax(energy / scale_factor)  # (B, H, N, 1, K) -> (B, H, N, 1, K)
         tmp = rearrange(attention@v, 'B H N 1 D -> B (H D) N').contiguous()  # (B, H, N, 1, K) @ (B, H, N, K, D) -> (B, H, N, 1, D) -> (B, C=H*D, N)
         
-        # mamba 
-        x = rearrange(x, 'B C N-> B N C').contiguous()
-        x = self.mamba(x)
-        x = rearrange(x, 'B N C -> B C N').contiguous()
+        # # mamba 
+        # x = rearrange(x, 'B C N-> B N C').contiguous()
+        # x = self.mamba(x)
+        # x = rearrange(x, 'B N C -> B C N').contiguous()
         
         x = self.bn1(x + tmp)  # (B, C, N) + (B, C, N) -> (B, C, N)
         tmp = self.ff(x)  # (B, C, N) -> (B, C, N)
         x = self.bn2(x + tmp)  # (B, C, N) + (B, C, N) -> (B, C, N)
         # print('shape x:', x.shape)
 
-        # # mamba 
-        # x = rearrange(x, 'B C N-> B N C').contiguous()
-        # x = self.mamba(x)
-        # x = rearrange(x, 'B N C -> B C N').contiguous()
+        # mamba 
+        x = rearrange(x, 'B C N-> B N C').contiguous()
+        x = self.mamba(x)
+        x = rearrange(x, 'B N C -> B C N').contiguous()
 
         return x
 
