@@ -1,12 +1,14 @@
 nohup: ignoring input
-03/15 19:03:47 - mmengine - INFO - 
+03/17 13:25:08 - mmengine - INFO - 
 ------------------------------------------------------------
 System environment:
     sys.platform: linux
     Python: 3.9.13 | packaged by conda-forge | (main, May 27 2022, 16:58:50) [GCC 10.3.0]
     CUDA available: True
-    numpy_random_seed: 1813009069
-    GPU 0: NVIDIA GeForce RTX 3090
+    numpy_random_seed: 46527246
+    GPU 0,1,2: NVIDIA GeForce RTX 3090
+    GPU 3: NVIDIA TITAN RTX
+    GPU 4: NVIDIA GeForce GTX 1080
     CUDA_HOME: /usr/local/cuda-11.7
     NVCC: Cuda compilation tools, release 11.7, V11.7.64
     GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
@@ -42,7 +44,7 @@ Runtime environment:
     GPU number: 1
 ------------------------------------------------------------
 
-03/15 19:03:47 - mmengine - INFO - Config:
+03/17 13:25:08 - mmengine - INFO - Config:
 model = dict(
     type='APESClassifier',
     backbone=dict(type='APESClsBackbone', which_ds='local'),
@@ -166,7 +168,7 @@ default_hooks = dict(
 custom_hooks = None
 default_scope = 'mmengine'
 work_dir = './work_dirs/apes_cls_local-modelnet-200epochs'
-load_from = None
+load_from = 'work_dirs/apes_cls_local-modelnet-200epochs/20240317_015926/best_val_acc_epoch_168.pth'
 resume = False
 launcher = 'none'
 experiment_name = 'apes_cls_local-modelnet-200epochs'
@@ -194,31 +196,77 @@ visualizer = dict(
     type='APESVisualizer', vis_backends=[dict(type='ModifiedLocalVisBackend')])
 cfg = dict(compile=True, sync_bn='torch', find_unused_parameters=False)
 
-03/15 19:03:47 - mmengine - WARNING - The prefix is not set in metric class Accuracy.
-Traceback (most recent call last):
-  File "/data/zhangrui/APES/utils/train.py", line 27, in <module>
-    main()
-  File "/data/zhangrui/APES/utils/train.py", line 20, in main
-    runner = Runner.from_cfg(cfg)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 439, in from_cfg
-    runner = cls(
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 408, in __init__
-    self.model = self.wrap_model(
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/runner/runner.py", line 851, in wrap_model
-    model = model.to(get_device())
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/mmengine/model/base_model/base_model.py", line 202, in to
-    return super().to(*args, **kwargs)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 989, in to
-    return self._apply(convert)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
-    module._apply(fn)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
-    module._apply(fn)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 641, in _apply
-    module._apply(fn)
-  [Previous line repeated 1 more time]
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 664, in _apply
-    param_applied = fn(param)
-  File "/home/feiben2/anaconda3/envs/apes2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 987, in convert
-    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
-torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 MiB (GPU 0; 23.70 GiB total capacity; 1.84 MiB already allocated; 3.56 MiB free; 2.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+03/17 13:25:08 - mmengine - WARNING - The prefix is not set in metric class Accuracy.
+03/17 13:25:11 - mmengine - INFO - Distributed training is not used, all SyncBatchNorm (SyncBN) layers in the model will be automatically reverted to BatchNormXd layers if they are used.
+03/17 13:25:11 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) ModifiedLoggerHook                 
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) ModifiedCheckpointHook             
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) ModifiedLoggerHook                 
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) ModifiedCheckpointHook             
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) ModifiedCheckpointHook             
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) ModifiedLoggerHook                 
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) ModifiedLoggerHook                 
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) ModifiedCheckpointHook             
+ -------------------- 
+after_train:
+(VERY_LOW    ) ModifiedCheckpointHook             
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) ModifiedLoggerHook                 
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) ModifiedLoggerHook                 
+ -------------------- 
+after_run:
+(BELOW_NORMAL) ModifiedLoggerHook                 
+ -------------------- 
+Loads checkpoint by local backend from path: work_dirs/apes_cls_local-modelnet-200epochs/20240317_015926/best_val_acc_epoch_168.pth
+03/17 13:25:12 - mmengine - INFO - Load checkpoint from work_dirs/apes_cls_local-modelnet-200epochs/20240317_015926/best_val_acc_epoch_168.pth
+03/17 13:25:31 - mmengine - INFO - Epoch(test) [308/308]    test_acc: 0.9347  data_time: 0.0003  time: 0.0549

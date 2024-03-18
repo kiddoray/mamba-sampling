@@ -218,7 +218,7 @@ class N2PAttention(nn.Module):
         self.bn2 = nn.BatchNorm1d(128)
 
         self.mamba = MixerModel(d_model=128, 
-                                n_layer=1,
+                                n_layer=2,
                                 rms_norm=False,
                                 drop_out_in_block=0.,
                                 drop_path=0.)
@@ -245,6 +245,12 @@ class N2PAttention(nn.Module):
         tmp = self.ff(x)  # (B, C, N) -> (B, C, N)
         x = self.bn2(x + tmp)  # (B, C, N) + (B, C, N) -> (B, C, N)
         # print('shape x:', x.shape)
+
+        # # mamba 
+        # x = rearrange(x, 'B C N-> B N C').contiguous()
+        # x = self.mamba(x)
+        # x = rearrange(x, 'B N C -> B C N').contiguous()
+
         return x
 
     @staticmethod
