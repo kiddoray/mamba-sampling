@@ -236,11 +236,6 @@ class N2PAttention(nn.Module):
         attention = self.softmax(energy / scale_factor)  # (B, H, N, 1, K) -> (B, H, N, 1, K)
         tmp = rearrange(attention@v, 'B H N 1 D -> B (H D) N').contiguous()  # (B, H, N, 1, K) @ (B, H, N, K, D) -> (B, H, N, 1, D) -> (B, C=H*D, N)
         
-        # # mamba 
-        # x = rearrange(x, 'B C N-> B N C').contiguous()
-        # x = self.mamba(x)
-        # x = rearrange(x, 'B N C -> B C N').contiguous()
-        
         x = self.bn1(x + tmp)  # (B, C, N) + (B, C, N) -> (B, C, N)
         tmp = self.ff(x)  # (B, C, N) -> (B, C, N)
         x = self.bn2(x + tmp)  # (B, C, N) + (B, C, N) -> (B, C, N)
@@ -268,6 +263,12 @@ class GlobalDownSample(nn.Module):
         self.v_conv = nn.Conv1d(128, 128, 1, bias=False)
         self.softmax = nn.Softmax(dim=-1)
 
+        self.mamba = MixerModel(d_model=128, 
+                                n_layer=1,
+                                rms_norm=False,
+                                drop_out_in_block=0.,
+                                drop_path=0.)
+
     def forward(self, x):
         q = self.q_conv(x)  # (B, C, N) -> (B, C, N)
         k = self.k_conv(x)  # (B, C, N) -> (B, C, N)
@@ -279,6 +280,10 @@ class GlobalDownSample(nn.Module):
         self.idx = selection.topk(self.npts_ds, dim=-1)[1]  # (B, N) -> (B, M)
         scores = torch.gather(attention, dim=1, index=repeat(self.idx, 'B M -> B M N', N=attention.shape[-1]))  # (B, N, N) -> (B, M, N)
         v = scores @ rearrange(v, 'B C N -> B N C').contiguous()  # (B, M, N) @ (B, N, C) -> (B, M, C)
+        
+        # mamba
+        v = self.mamba(v)
+
         out = rearrange(v, 'B M C -> B C M').contiguous()  # (B, M, C) -> (B, C, M)
         return out
 
@@ -293,6 +298,12 @@ class LocalDownSample(nn.Module):
         self.k_conv = nn.Conv2d(128, 128, 1, bias=False)
         self.v_conv = nn.Conv2d(128, 128, 1, bias=False)
         self.softmax = nn.Softmax(dim=-1)
+
+        self.mamba = MixerModel(d_model=128, 
+                                n_layer=1,
+                                rms_norm=False,
+                                drop_out_in_block=0.,
+                                drop_path=0.)
 
     def forward(self, x):
         neighbors = ops.group(x, self.K, self.group_type)  # (B, C, N) -> (B, C, N, K)
@@ -310,6 +321,11 @@ class LocalDownSample(nn.Module):
         scores = torch.gather(attention, dim=1, index=repeat(self.idx, 'B M -> B M 1 K', K=attention.shape[-1]))  # (B, N, 1, K) -> (B, M, 1, K)
         v = torch.gather(v, dim=1, index=repeat(self.idx, 'B M -> B M K C', K=v.shape[-2], C=v.shape[-1]))  # (B, N, K, C) -> (B, M, K, C)
         out = rearrange(scores@v, 'B M 1 C -> B C M').contiguous()  # (B, M, 1, K) @ (B, M, K, C) -> (B, M, 1, C) -> (B, C, M)
+
+        out = rearrange(out, 'B C M-> B M C').contiguous()
+        out = self.mamba(out)
+        out = rearrange(out, 'B M C -> B C M').contiguous()
+        
         return out
 
 
